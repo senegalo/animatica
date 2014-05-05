@@ -3,27 +3,27 @@
     <head>
         <meta charset="UTF-8">
         <title>Animatica</title>
-        
+
         <script type="text/javascript" src="js/jquery.js"></script>
         <script type="text/javascript" src="js/kernel.js"></script>
         <script type="text/javascript" src="js/library.js"></script>
         <script type="text/javascript" src="js/animation.js"></script>
         <script type="text/javascript">
-            
-						var movie1_length = 20000;
-						var movie2_length = 2000;//32000;
 
-            $(function(){
+            var movie1_length = 20000;
+            var movie2_length = 2000;//32000;
+
+            $(function() {
                 //let's run Animatica !!!
                 var a = new Animatica();
                 createScene1(a);
-								createAnimationScene1(a);
+                createAnimationScene1(a);
                 a.play();
 
             });
         </script>
     </head>
     <body>
-				<div id="scene" style="width:640px; height:360px;overflow:hidden; position: absolute;"></div>
+        <div id="scene" style="width:640px; height:360px;overflow:hidden; position: absolute;"></div>
     </body>
 </html>
