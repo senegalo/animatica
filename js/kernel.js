@@ -18,6 +18,12 @@ Animatica.prototype.addToSceneLibrary = function(objID, obj) {
     this.currentScene.library[objID] = obj;
 };
 
+Animatica.prototype.syncQueues = function() {
+    this.currentScene.animations.push({
+        syncTime: true
+    });
+};
+
 Animatica.prototype.addAnimation = function(animObj,propObj) {
     this.currentScene.animations.push({
         animationProp: propObj,
@@ -26,9 +32,10 @@ Animatica.prototype.addAnimation = function(animObj,propObj) {
 };
 
 Animatica.prototype.play = function() {
-    var body = $(document.body);
+    var body = $("#scene");
     var queues = {};
     var currTime = 0;
+		var syncTime = 0;
 
     for (var f = 0, senariosLength = this.scenario.length; f < senariosLength; f++) {
 
@@ -38,18 +45,19 @@ Animatica.prototype.play = function() {
         for (var i in frame.library) {
             var item = frame.library[i];
 
-            if (frame.library[i].type === "image") {
-                var element = $("<img/>").attr({
+						var element;
+            if (item.type === "image") {
+                element = $("<img/>").attr({
                     src: item.src,
                     id: i
                 }).appendTo(body);
 
-            } else if (frame.library[i].type === "text") {
-                var element = $("<div/>").attr({
+            } else if (item.type === "text") {
+                element = $("<div/>").attr({
                     id: i
                 }).text(item.string).appendTo(body);
             } else if (item.type === "sprite"){
-                var element = $('<div/>').attr({
+                element = $('<div/>').attr({
                     id: i
                 }).css({
                     height: item.height,
@@ -68,11 +76,17 @@ Animatica.prototype.play = function() {
                     currentFrame: 0,
                     ticker: 0
                 };
-            }
+            } else if (item.type === "video") {
+								element = $("<video/>").attr({
+										id: i,
+										src: item.src
+								}).appendTo(body);
+						}
             
             element.css({
                 position: "absolute"
             });
+            
 
             if (item.init) {
                 item.init.call(element);
@@ -80,7 +94,21 @@ Animatica.prototype.play = function() {
         }
 
         //running the scene Animation
+			
         for (var a = 0, aLen = frame.animations.length; a < aLen; a++) {
+						
+						if(frame.animations[a].syncTime == true) {
+							for (var q in queues) {
+								syncTime = queues[q].time > syncTime ? queues[q].time : syncTime;	
+							}
+
+
+							for (var q in queues) {
+								queues[q].time = syncTime;
+							}
+							continue;
+						}
+
             var animation = frame.animations[a];
             var element = $("#" + animation.animationProp.on);
 
@@ -88,10 +116,11 @@ Animatica.prototype.play = function() {
             //time 
             var queue = queues[animation.animationProp.queue];
             if (!queue) {
-                element.delay(currTime, animation.animationProp.queue);
+                // element.delay(currTime, animation.animationProp.queue);
                 queue = queues[animation.animationProp.queue] = {
                     elements: {},
-                    time: currTime
+										elementsTimes: {},
+                    time: syncTime
                 };
             }
 
@@ -101,9 +130,19 @@ Animatica.prototype.play = function() {
             if (!qElement) {
                 queues[animation.animationProp.queue].
                         elements[animation.animationProp.on] = element;
+                queues[animation.animationProp.queue].
+                        elementsTimes[animation.animationProp.on] 
+														= queues[animation.animationProp.queue].time;
                 element.delay(queues[animation.animationProp.queue].time,
                         animation.animationProp.queue);
             }
+
+						if(queues[animation.animationProp.queue].
+                        elementsTimes[animation.animationProp.on] < queues[animation.animationProp.queue].time) {
+                element.delay(queues[animation.animationProp.queue].time - queues[animation.animationProp.queue].
+                        elementsTimes[animation.animationProp.on],
+                        animation.animationProp.queue);
+						}
 
             if (animation.animationProp.delay) {
                 element.delay(animation.animationProp.delay,
@@ -115,13 +154,20 @@ Animatica.prototype.play = function() {
             element.animate(animation.animationObj, {
                 duration: animation.animationProp.duration,
                 queue: animation.animationProp.queue,
-                start: animation.animationProp.start
+                start: animation.animationProp.start,
+								complete: animation.animationProp.complete,
+								easing: animation.animationProp.easing,
+								step: animation.animationProp.step
             });
             queue.time += animation.animationProp.duration;
+						queues[animation.animationProp.queue].
+                        elementsTimes[animation.animationProp.on] 
+														= queues[animation.animationProp.queue].time;
         }
 
         //find the queue that is ahead of them all and fill the gaps with
         //even Moer delays !! :D
+/*
         var ahead;
         for (var q in queues) {
             if (!ahead || queues[q].time[ahead] < queues[q].time[q]) {
@@ -141,6 +187,7 @@ Animatica.prototype.play = function() {
                 }
             }
         }
+*/
     }
 
     //dequeuing all queues !! let the Fun begin !!

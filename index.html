@@ -6,172 +6,24 @@
         
         <script type="text/javascript" src="js/jquery.js"></script>
         <script type="text/javascript" src="js/kernel.js"></script>
+        <script type="text/javascript" src="js/library.js"></script>
+        <script type="text/javascript" src="js/animation.js"></script>
         <script type="text/javascript">
             
+						var movie1_length = 20000;
+						var movie2_length = 2000;//32000;
+
             $(function(){
                 //let's run Animatica !!!
                 var a = new Animatica();
-                
-                a.createScene({
-                    background: "bg1.jpg",
-                        sound: "background.mp3"
-                    });
+                createScene1(a);
+								createAnimationScene1(a);
+                a.play();
 
-
-                    //Adding stuff to this scene library
-                    a.addToSceneLibrary("duckHorse", {
-                        src: "images/duck_horse.jpg",
-                        type: "image",
-                        init: function() {
-                            this.css({
-                                top: 0,
-                                left: 0,
-                                opacity: 0
-                            });
-                        }
-                    });
-
-                    a.addToSceneLibrary("duckHorseText", {
-                        string: "Ana Duck Horse... we ba7eb Masr !",
-                        type: "text",
-                        init: function() {
-                            this.css({
-                                bottom: 100,
-                                left: 0,
-                                opacity: 0
-                            });
-                        }
-                    });
-
-                    a.addToSceneLibrary("sharkHorse", {
-                        src: "images/shark_horse.jpg",
-                        type: "image",
-                        init: function() {
-                            this.css({
-                                top: 0,
-                                left: 0,
-                                opacity: 0
-                            });
-                        }
-                    });
-
-                    a.addToSceneLibrary("sharkHorseText", {
-                        string: "Ana Shark Horse... we ba7eb Masr !",
-                        type: "text",
-                        init: function() {
-                            this.css({
-                                bottom: 100,
-                                left: 0,
-                                opacity: 0
-                            });
-                        }
-                    });
-                    
-                    a.addToSceneLibrary("dude", {
-                        type: "sprite",
-                        sprite: "images/fire.png",
-                        orientation: "h",
-                        updateRate: 1,
-                        frames: 8,
-                        height: 32,
-                        width: 32
-                    });
-
-                    //let's animate those stuff in the scene
-                    a.addAnimation({
-                        left: 800,
-                        top: 100,
-                        opacity: 1
-                    },{
-                        duration: 10000,
-                        on: "dude",
-                        queue: "q3"
-                    });
-                    
-                    a.addAnimation({
-                        left: 500,
-                        top: 100,
-                        opacity: 1
-                    }, {
-                        duration: 1000,
-                        on: "sharkHorse",
-                        queue: "q1"
-                    });
-
-                    a.addAnimation({
-                        left: 500,
-                        right: 100,
-                        opacity: 1
-                    }, {
-                        duration: 1000,
-                        on: "sharkHorseText",
-                        queue: "q2"
-                    });
-
-                    a.addAnimation({
-                        opacity: 0
-                    }, {
-                        delay: 3000,
-                        duration: 1000,
-                        on: "sharkHorse",
-                        queue: "q1"
-                    });
-
-                    a.addAnimation({
-                        opacity: 0
-                    }, {
-                        delay: 3000,
-                        duration: 1000,
-                        on: "sharkHorseText",
-                        queue: "q2"
-                    });
-
-                    a.addAnimation({
-                        opacity: 1,
-                        left: 100,
-                        top: 100
-                    }, {
-                        duration: 1000,
-                        on: "duckHorse",
-                        queue: "q1",
-                        start: function() {
-                            console.log('IT WORKED');
-                        }
-                    });
-
-                    a.addAnimation({
-                        opacity: 1,
-                        left: 100,
-                        top: 100
-                    }, {
-                        duration: 1000,
-                        on: "duckHorseText",
-                        queue: "q2"
-                    });
-
-                    a.addAnimation({
-                        opacity: 0
-                    }, {
-                        duration: 1000,
-                        delay: 2000,
-                        on: "duckHorse",
-                        queue: "q1"
-                    });
-
-                    a.addAnimation({
-                        opacity: 0
-                    }, {
-                        duration: 1000,
-                        delay: 2000,
-                        on: "duckHorseText",
-                        queue: "q2"
-                    });
-                    
-                    a.play();
-
-                });
+            });
         </script>
     </head>
     <body>
+				<div id="scene" style="width:640px; height:360px;overflow:hidden; position: absolute;"></div>
     </body>
 </html>
