@@ -1,6 +1,7 @@
 
 var Animatica = function() {
     this.scenario = [];
+    this.spritesUpdater = {};
 };
 
 Animatica.prototype.createScene = function(obj) {
@@ -47,7 +48,31 @@ Animatica.prototype.play = function() {
                 var element = $("<div/>").attr({
                     id: i
                 }).text(item.string).appendTo(body);
+            } else if (item.type === "sprite"){
+                var element = $('<div/>').attr({
+                    id: i
+                }).css({
+                    height: item.height,
+                    width: item.width,
+                    overflow: "hidden"
+                }).append($('<img src="'+item.sprite+'"/>')).
+                        appendTo(body);
+                
+                var length = item.orientation === "h" ? item.width : item.height;
+                this.spritesUpdater[i] = {
+                    element: element,
+                    orientation: item.orientation,
+                    frames: item.frames,
+                    updateRate: item.updateRate || 1, 
+                    length: length,
+                    currentFrame: 0,
+                    ticker: 0
+                };
             }
+            
+            element.css({
+                position: "absolute"
+            });
 
             if (item.init) {
                 item.init.call(element);
@@ -124,4 +149,29 @@ Animatica.prototype.play = function() {
             queues[q].elements[qelement].dequeue(q);
         }
     }
+    
+    //let the heart beat ! 
+    this.heartBeat();
+};
+
+Animatica.prototype.heartBeat = function(){
+    for(var s in this.spritesUpdater){
+        var sprite = this.spritesUpdater[s];
+        if(sprite.ticker++ < sprite.updateRate){
+            continue;
+        }
+        sprite.ticker = 0;
+        var length = sprite.length;
+        var margin = sprite.orientation === "h" ? "marginLeft" : "marginTop";
+        
+        sprite.element.find("img").css(margin,  -1*length*sprite.currentFrame);
+        
+        if(++sprite.currentFrame >= sprite.frames){
+            sprite.currentFrame = 0;
+        }
+    }
+    var self = this;
+    setTimeout(function(){
+        self.heartBeat();
+    }, 41);
 };
